@@ -1,0 +1,209 @@
+% !TEX encoding = UTF-8 Unicode
+\documentclass{jsarticle}
+
+\usepackage{listings}
+\usepackage[dvipdfm]{hyperref}
+
+\title{nanaka-inside C82配布物}
+\author{nanaka-inside}
+
+\begin{document}
+\maketitle
+
+\section{Wikipediaで6回リンクたどればいけるか調べるサイトを一日で作った話}
+\subsection{概要}
+暑いですね。
+これを書いている今日は7/1ですが、皆さんいかがお過ごしでしょうか。
+
+初めまして、\htmladdnormallinkfoot{@mtgto}{http://twitter.com/mtgto}です。ふだんは会社でiPhoneアプリやHTTPサーバのプログラムを書いて過ごしています。
+
+昨年の今頃、私はとあるSNSサービスの新規立ち上げの開発に携わっており、土日があったりなかったりという程度の忙しさに巻き込まれていました。
+ちょうどその頃は仕事も佳境にきており、私の仕事は品質保証テストで上がってきた問題の解決を行うということがほとんどでした。
+そんな折に「wikipediaは6回リンクを辿ればどのページでもいけるらしいｗｗｗ」\footnote{http://blog.livedoor.jp/goldennews/archives/51657545.html}という記事をRSSリーダーで見かけました。
+いわゆる「六次の隔たり」
+\htmladdnormallinkfoot{ほげ}{http://ja.wikipedia.org/wiki/}
+で全てを探索できる（適当）というものです。
+ふと「これって自動で見つけられるのかな」と思ったところからこの話は始まります。
+なお実際に完成したものがあります\footnote{http://pediaroute.com/}ので、探索の仕組みやら作った時の苦労話に興味が無い方は読み飛ばしていただいて構いません。
+お手数ですが右上の×ボタンを押して閉じてください。
+
+\subsection{設計}
+知人の知人というように辿って行くとわずか5回辿るだけで世界中の人間に辿り着けるという話を聞いたことがあるでしょうか？
+余談ながら私の知人にビル・ゲイツと知り合いという人がいるので、私からビル・ゲイツまでは3ホップとなります。
+そもそもWikipediaのリンクの最短検索ということが現実的に可能なのでしょうか？まずはそれを検討することにしました。
+※ここでいう現実的に可能とは、ウェブサイトとして負荷に耐えられるかどうかも含みます。
+まずはデータをダウンロードしましょう。
+Wikipediaのページ数は204万件(2011年8月24日版)、ページ間リンクの数は6,677万件ありました。リンクの数は多いページで100を超える程度でしょう。
+（リンク数最大のページ知りたいような、どうせカテゴリだしいいか）
+2011年8月当時は30kB/秒ほど出なかったので、ダウンロードを開始してから寝た覚えがあります。
+2012年7月に最新版(20120630)をダウンロードしてみたところ300kB/秒ほど出るようになっていました。界王拳10倍だ！
+
+今回の問題をプログラミングの問題っぽく表現すると、
+ページをノード、ページ間のリンクを枝（すべて長さ1とする）とした巨大な有向グラフがあり、
+この有向グラフ上で特定の始点ノードと終点ノードがあたえられたときに、
+長さ6以下で到達できる最短の経路を求めよ、というものになります。
+
+プログラムでの探索手順としては有名なものに「深さ優先探索」と「幅優先探索」があります。有名すぎるので知らない人はぐぐってください。
+最短のものを見つけることを必要としないのであれば、それ以外にも
+今回は最大の深さを６とした深さ優先探索（もしくは反復深化深さ優先探索）と
+つまりページ数xページ数のリンクがあるかどうかのテーブルを作らずとも
+
+設計段階ではしょりましたが、ダイクストラ法などを利用してもよいと思います。
+その場合にはノードとノードの距離がどれも1として行えばOKです（幅優先探索と変わらなくなりますが）。
+
+今回は始点ノードと終点ノードからそれぞれ幅優先探索を行い、最初に両側からの探索で見つかったものを採用することにしました。
+
+\subsubsection{幅優先探索（もっとわかりやすい言葉ないかな）}
+始点ノードから到達できるノード集合をS、終点ノードへと到達できるノード集合をGとする
+\begin{enumerate}
+\item 探索の初期状態は、
+\[
+S_0 = {N_S}, G_0 = {N_G}
+\]
+となっている
+\item 集合SとGのどちらか小さい方から一つだけ探索を行う。
+  \begin{enumerate}
+    \item Sが小さい場合はSに含まれるノードから一つだけリンクを行ったノードを求め（どのノードから探索されたかをメモっておく）、それぞれがGに含まれるかどうかを調べる。
+      このノードがGに含まれる場合は経路が見つかったのでメモしておいたリンク元（先）ノード情報から経路を求める。
+    \item Gが小さい場合はGに含まれるノードから一つだけ逆リンクを行ったノードを求め（どのノードから逆探索されたかをメモっておく）、それぞれがSに含まれるかどうかを調べる。
+      このノードがSに含まれる場合は経路が見つかったのでメモしておいたリンク先（元）ノード情報から経路を求める。
+  \end{enumerate}
+\end{enumerate}
+※図がほしい→KeyNoteのあれ
+
+\subsubsection{使用言語}
+今回の設計ではすべてのリンクをメモリ上におかなければなりません。このため1リンクごとに消費されるサイズがなるべく小さいことが望まれます。
+今回はコンパイル言語の中でJava、C、C++が残り、開発するために残された時間の短さの制約から普段から書き慣れているJavaを選択しました。
+
+\subsection{IRCボット完成まで}
+さて設計が完成したので実装をはじめることにしましょう。
+実装の工程は大きく分けて
+「ページデータとリンクデータをメモリ上に乗せやすい形に変換する」
+「メモリ上にあるページデータとリンクデータを使って探索を行う」
+の2つです。
+
+\subsubsection{ページデータとリンクデータの作成}
+ページデータ、リンクデータはWikipediaからMySQLのSQLクエリとして提供されています。
+SQLクエリとはいえ、ただのINSERT文（リンクデータの場合3000万行ありますが）あるだけですので、
+もちろん正規表現などを使用して読み込んでも構わないのですが、
+今回は実装に時間がないことから（そればっかり）確実さを重視して一度MySQLへのインポートを行なってから処理することにしました。
+ちなみに今回はページデータとリンクデータのみを利用しましたが、それ以外にも様々なデータが提供されています。
+例を挙げると、
+
+\subsubsection{探索}
+探索プログラムは先に出てきた「両側からの幅優先探索」を行うものです。
+まず用意したデータからページ間のリンク（リンク先とリンク元の両方を用意したので、通常の二倍使用しています）をメモリ上に展開します。
+最初は手で紙に書いた小さなグラフで実装、デバッグを行い、そのあと実際のデータを使って確認を行いましたが
+小さなグラフでちゃんと探索できるようになったあとはほぼバグもなくスムーズに進めることが出来ました。
+\subsubsection{PircBot}
+IRCを簡単に説明すると複数人と同時にオンラインチャットできるシステムです。
+今回IRCへの接続、ボット処理（誰かの発言に対してプログラムが発言を返したりすること。人工無脳が有名）
+IRCボットが完成したのが○○時〇〇分のことでした。この時点ではウェブサイトとして公開することはまだ考えていませんでした。
+
+\subsection{Webサイト完成、負荷やばい、wikitterのはなし}
+この時点ではWebサーバを作成しようとは考えていなかったのですが、
+友人からのIRC上でのすすめもあり、公開できるものを作ってみようと考えました。
+
+\subsubsection{Play!}
+探索プログラム、IRCbotをJavaによって記述したので、ウェブサーバもJavaで作ることにしました。
+Play!はRuby on rails風のMVCウェブサーバで、Javaで記述することができます。
+ビューテンプレートが独自で、さらにビューへの引数の型が要求されるなどrailsとは違った苦労もありましたが
+デプロイは非常に簡単なため（TomcatとかJettyとかは強いですが、即日公開したいサービスには巨大すぎました・・・）採用しました。
+実際Play!を使ったのは今回が初めてでしたが、それほど戸惑うことなく（検索画面と検索結果の2ページしかないウェブサイトですが）サクサク作ることができました。
+
+\subsubsection{ドメインとったよ}
+pediaroute.com
+ServersMan VPSの2GBプランを選択し、Ubuntu Server 10.04に適当に設定を加え（sshd設定、firewallだけ）
+
+\subsubsection{負荷ヤバイの話}
+公開した初日はIRCのメンバーと自身のツイッターでつぶやいた程度だったため、全然流行らず作っただけの自己満で終わるところでした。
+それが会社内でのIRCで宣伝したところ、それなりに口コミで流行し、秒間10回程度のアクセスが発生するほどになりました。
+会社内からそれを見て喜んでいたのですが、一方で「つながらない」というコメントも見受けられるようになり、
+実際にアクセスしてみると検索はおろかページの表示すらままならないということに気づきました。
+
+調べたところ、今回探索を行う処理を「synchronizedブロックを使って」最大1スレッドまでとしているのですが、
+（これには理由があって探索処理はCPUはそれほど食わないのですがメモリを多い時に数メガバイト持っていくので、
+　同時に探索を許可してしまうとメモリの上限を超えて、Java VMがクラッシュしてしまう危険性があったため規制していました。）
+このロックとPlay!のりクエスト処理の相性が悪かったようで、その後Promiseという仕組みを使って書き直したところ落ちることはなくなりました。
+身を持って慣れてないウェブフレームワークを使うことの難しさを再考させられる経験になりました。
+
+\subsection{まとめ、今後の予定}
+pediarouteの話はどこかで書こうと思っていたのですが、こういう形で過去の創作物の話をまとめることができて幸いでした。
+当時は「コーディング・ハイ」という感じで、だれることなくフルスピードでプログラムを仕上げることができ、とても楽しかったのをよく覚えています。
+気が向いたら英語版も作ってみたいですね（またデスマに巻き込まれた時にでも・・・）。
+
+\section{iPhoneで他のアプリと連携}
+この話はApp Storeのレビューを受けてない話も含まれるので、実際に使用する際は自己責任でお願い致します。
+
+\subsection{NSURL形式}
+公式で用意されている由緒正しい方法です。
+カスタムURLスキーマ
+iOS 4.1までは起動アプリが何かを判定できないよ
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
+iOS 4.2以上でいいならこっちを使ってね
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+iPhone Simulatorや実機上で実行してみるとわかりますが、sourceApplicationには起動したアプリのバンドルIDが来るので、
+
+\subsubsection{受け取ったクエリをパースする方法}
+\begin{lstlisting}{language=[objective]c;caption=起動URLクエリをパースする方法}
+for (NSString* parameterString in [queryString componentsSeparatedByString:@"&"]) {
+  NSArray* parameterArray = [parameterString componentsSeparatedByString:@"="];
+  if ([parameterArray count] != 2) {
+	NSLog(@"Invalid parameter: \%@", parameterString);
+	continue;
+  }
+  NSString* parameterKey = [(NSString*)[parameterArray objectAtIndex:0]
+	stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+  NSString* parameterValue = [(NSString*)[parameterArray objectAtIndex:1]
+	stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+  NSLog(@"key=\%@, value=\%@", parameterKey, parameterValue);
+}
+\end{lstlisting}
+\subsubsection{Facebook SDK}
+Facebook iOS SDKではこの仕組みを利用して、自作アプリからFacebookアプリを呼び出してユーザ認証などを行うことができます。
+用意するもの：
+まず自分のプロジェクトにFacebook SDKをインポートを行い、Facebookから呼び出されるためのカスタムURLスキーマをInfo.plistに登録します。
+
+\subsubsection{ソケット通信}
+先のNSURL形式では情報を通知するために別アプリを一度フォアグラウンドにする必要があります。
+そのため、細かい情報のやり取りをしたい場合にはNSURLは向いていないことになります。
+プロセスがバックグラウンドにいるときに
+バックグラウンドで実行しているアプリケーションは通常だと10分までしか処理を行なってくれず、
+それを超えるとOSによってプロセスが強制的に終了されてしまいます。
+→他のプロセスが生きてるかどうか分かる？
+
+\subsection{NSNotifactionCenter}
+
+\subsection{共有メモリ形式}
+iOSにはサンドボックス機構があり、他プロセスのメモリに直接アクセスすることは出来ません。
+
+\subsection{ファイル}
+iOS アプリケーションプログラミングガイドによると
+https://developer.apple.com/jp/devcenter/ios/library/documentation/iPhoneAppProgrammingGuide.pdf
+アプリケーション（および環境設定を含むデータ）をサンドボックス内に
+
+\subsection{NSUserDefaults}
+だめだよ！
+
+\subsection{脱線：fork}
+int pid = fork();
+	if (pid < 0) {
+		NSLog(@"fork failed");
+	} else if (pid == 0) {
+		for (int i=0; i<1000; i++) {
+			NSLog(@"\%d", i);
+			sleep(1);
+		}
+	} else {
+		int retVal = UIApplicationMain(argc, argv, nil, nil);
+		[pool release];
+		return retVal;
+	}
+シミュレータだと動いたけど、実機だとダメだった
+
+\subsection{音}
+
+\subsection{加速度センサー}
+
+
+\end{document}
