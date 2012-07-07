@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:SOCKET_HOST/SOCKET_HOST.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:SOCKET_HOST/Pods/Pods.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:SHM_GUEST/SHM_GUEST.xcodeproj">
    </FileRef>
    <FileRef

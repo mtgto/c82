@@ -275,6 +275,7 @@
 				CED0D49D158DCAC90061E9B8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

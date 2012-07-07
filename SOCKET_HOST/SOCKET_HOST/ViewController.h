@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
+@interface ViewController : UIViewController {
+    dispatch_queue_t socketQueue;
+}
+@property (weak, nonatomic) IBOutlet UITextField *valueField;
+- (IBAction)pushListen:(id)sender;
 
 @end
