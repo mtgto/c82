@@ -1,5 +1,5 @@
 % !TEX encoding = UTF-8 Unicode
-\documentclass{jsarticle}
+\documentclass[b5paper]{jsarticle}
 
 \usepackage{ascmac}
 \usepackage{listings}
@@ -140,7 +140,7 @@ railsはそれなりに使ったことがあったのも良かったのかもビ
 
 \subsubsection{ドメインとったよ}
 最初は自分が普段使っているサイトのサブドメインで運用していたのですが、pediaroute.com
-ServersMan VPSの2GBプランを選択し、Ubuntu Server 10.04に適当に設定を加え（sshd、firewallくらい）をsshdとweb以外は使えなくする}、
+ServersMan VPSの2GBプランを選択し、Ubuntu Server 10.04に適当に設定を加え（sshd、firewallくらい）をsshdとweb以外は使えなくする、
 Playを適当にデプロイしました。
 MySQLも使わないし、あっという間に終わりました。
 
@@ -163,6 +163,8 @@ pediarouteの話はどこかで書こうと思っていたのですが、こう�
 気が向いたら英語版も作ってみたいですね（またデスマに巻き込まれた時にでも・・・）。
 
 \section{iPhoneで他のアプリと連携}
+こんにちは。会社や趣味でiPhoneアプリを作ったりしている@mtgtoです。
+会社では複数のiPhoneアプリを作っているのですが、
 この話はApp Storeのレビューを受けてない話も含まれるので、実際に使用する際は自己責任でお願い致します。
 
 \subsection{NSURL形式}
@@ -194,7 +196,7 @@ Facebook iOS SDKではこの仕組みを利用して、自作アプリからFace
 用意するもの：
 まず自分のプロジェクトにFacebook SDKをインポートを行い、Facebookから呼び出されるためのカスタムURLスキーマをInfo.plistに登録します。
 
-\subsubsection{ソケット通信}
+\subsection{ソケット通信}
 先のNSURL形式では情報を通知するために別アプリを一度フォアグラウンドにする必要があります。
 そのため、細かい情報のやり取りをしたい場合にはNSURLは向いていないことになります。
 プロセスがバックグラウンドにいるときに
@@ -202,7 +204,34 @@ Facebook iOS SDKではこの仕組みを利用して、自作アプリからFace
 それを超えるとOSによってプロセスが強制的に終了されてしまいます。
 →他のプロセスが生きてるかどうか分かる？
 
+ここでは\htmladdnormallinkfoot{CocoaAsyncSocket}{https://github.com/robbiehanson/CocoaAsyncSocket}を使ってみましょう。
+GCD版とRunLoop版の二種類がありますが、iOSの場合ハードウェアリソースに限りがあるので、どちらでも構わないと思っています。
+今回はGCD版でサーバとクライアントを作ってみました。
+
+TCP通信であれば難なく接続することができますが、当然他のアプリにバインドされてしまうこともあるのでポートを固定にしないよう実装しましょう。
+その場合使用するポートをどうやって相手のアプリに渡すか考えなければなりません。
+
+またバックグラウンドで受信するためにはバックグラウンドタスクとして登録しておく必要があります。
+
 \subsection{NSNotifactionCenter}
+Mac OS Xの場合、NSDistributedNotificationCenterを使って他のアプリケーション間でメッセージのやり取りをすることができます。
+ですがiOSにはありません。
+\subsubsection{メッセージを受ける側の処理}
+\begin{itemize}
+  \item \htmladdnormallinkfoot{CPDistributedMessagingCenter.h}{https://github.com/kennytm/iphone-private-frameworks/blob/master/AppSupport/CPDistributedMessagingCenter.h}をプロジェクトに追加する。
+  \item CPDistributedMessagingCenter\#centerNamedで自分の通知センターを作る
+  \item CPDistributedMessagingCenter\#registerForMessageNameで通知したいメッセージとセレクタを登録
+\end{itemize}
+
+\subsubsection{メッセージを送る側の処理}
+\begin{itemize}
+  \item CPDistributedMessagingCenter.hをプロジェクトに追加する
+  \item CPDistributedMessagingCenter\#centerNamedで自分の通知センターを作る
+  \item CPDistributedMessagingCenter\#sendMessageName:userInfo:で送信する
+\end{itemize}
+
+ただしCPDistributedMessagingCenterはプライベートAPIなので、App Storeに出すときにはほぼ間違いなくリジェクト食らうと思います。
+個人のiPhoneで楽しむか、jailbreak環境で楽しむくらいがいいですね。
 
 \subsection{共有メモリ形式}
 iOSにはサンドボックス機構があり、他プロセスのメモリに直接アクセスすることは出来ません。
