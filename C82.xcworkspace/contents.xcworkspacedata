@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:NOTIFY_GUEST/NOTIFY_GUEST.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:NOTIFY_HOST/NOTIFY_HOST.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:SOCKET_GUEST/SOCKET_GUEST.xcodeproj">
    </FileRef>
    <FileRef
