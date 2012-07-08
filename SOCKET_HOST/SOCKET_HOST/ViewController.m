@@ -41,6 +41,8 @@
     if (![socket acceptOnPort:12345 error:&error]) {
         NSLog(@"failed to accept socket.");
         self.valueField.text = @"failed to accept socket.";
+    } else {
+        self.valueField.text = @"waiting for accept";
     }
 }
 
@@ -62,13 +64,9 @@
 
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag {
     // echo
-    dispatch_async(dispatch_get_main_queue(), ^{
-        @autoreleasepool {
-            NSString *str = [NSString stringWithUTF8String:[data bytes]];
-            self.valueField.text = str;
-            NSLog(@"receive: %@", str);
-        }
-    });
+    NSString *str = [NSString stringWithUTF8String:[data bytes]];
+    self.valueField.text = str;
+    NSLog(@"receive: %@", str);
     [sock writeData:data withTimeout:-1 tag:0];
 }
 
