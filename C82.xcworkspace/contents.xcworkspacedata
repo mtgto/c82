@@ -2,6 +2,15 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:CUSTOM_URL/CUSTOM_URL.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:FILE_GUEST/FILE_GUEST.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:FILE_HOST/FILE_HOST.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:NOTIFY_GUEST/NOTIFY_GUEST.xcodeproj">
    </FileRef>
    <FileRef

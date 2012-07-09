@@ -118,20 +118,38 @@ SQLクエリとはいえ、ただのINSERT文（リンクデータの場合3000�
 まず用意したデータからページ間のリンク（リンク先とリンク元の両方を用意したので、通常の二倍使用しています）をメモリ上に展開します。
 最初は手で紙に書いた小さなグラフで実装、デバッグを行い、そのあと実際のデータを使って確認を行いましたが
 小さなグラフでちゃんと探索できるようになったあとはほぼバグもなくスムーズに進めることが出来ました。
-\subsubsection{PircBot}
-IRCを簡単に説明すると複数人と同時にオンラインチャットできるシステムです。
-今回IRCへの接続、ボット処理（誰かの発言に対してプログラムが発言を返したりすること。人工無脳が有名）
-IRCボットが完成したのが○○時〇〇分のことでした。この時点ではウェブサイトとして公開することはまだ考えていませんでした。
 
-\subsection{Webサイト完成、負荷やばい、wikitterのはなし}
+\subsubsection{IRC Bot}
+まずIRCの仲間たちにお披露目するためにIRC botとして作ることにしました。
+IRCを簡単に説明すると複数人と同時にオンラインチャットできるシステムです。
+今回IRCへの接続、ボット処理（誰かの発言に対してプログラムが発言を返したりすること。人工無脳が有名）には
+\htmladdnormallinkfoot{PircBot}{http://www.jibble.org/pircbot.php/}を使い、
+誰かの''w:ドラえもん 野球''という発言に対して、''$[$ドラえもん, 野球$]$ ドラえもん -$>$ 1940年 -$>$ 野球''を返してくれるプログラムを作成しました。
+IRCボットが完成したのが21時22分のことでした。
+
+\begin{itembox}{その日のirc ログ}
+  21:22:02 $<$mtgto$>$ w: 花火 出店\\
+  21:22:03 {goto\_bot} [花火, 出店] 花火 -$>$ 飯田市 -$>$ リンゴ -$>$ 出店 (0.02sec)\\
+  21:22:07 $<$mtgto$>$ やっとできた\\
+  21:22:19 * ***** changed mode (+o, goto\_bot)\\
+  21:22:34 $<$mtgto$>$ w: ドラえもん 野球\\
+  21:22:35 {goto\_bot} [ドラえもん, 野球] ドラえもん -$>$ 1940年 -$>$ 野球 (0.00sec)\\
+  21:22:55 $<$mtgto$>$ wikipediaページリンクでいけるかな？をつくった
+\end{itembox}
+
+\subsection{Webサイト作ることにした}
 この時点ではWebサーバを作成しようとは考えていなかったのですが、
 友人からのIRC上でのすすめもあり、公開できるものを作ってみようと考えました。
+
+まずはサーバから。今回のプログラムを動かすのに一番ネックになるのは実行に必要な700MB強のメモリです。
+サーバはServersMan VPSの2GBプランを選択し、Ubuntu Server 10.04に適当に設定を加え（sshd、firewallくらい）Playを適当にデプロイしました。
+今回はMySQLもApacheも使わないし、あっという間に終わりました。
 
 \subsubsection{Play! framework}
 探索プログラム、IRCbotをJavaによって記述したので、ウェブサーバもJavaで作ることにしました。
 残り時間が限られているため、簡単に使えるウェブフレームワークを探したところ、
 \htmladdnormallinkfoot{Play! framework}{http://playframework.org/}がいいのではないかと判断しました。
-TomcatとかJettyとかは強いですが、即日公開したいサービスには巨大すぎました・・・。
+TomcatとかJettyとかはウェブサーバとしてはもちろん「強い」のですが、即日公開したいサービスには巨大すぎました・・・。
 
 Play!はRuby on rails風のMVCウェブサーバで、Javaで記述することができます。
 railsはそれなりに使ったことがあったのも良かったのかもビューテンプレートが独自で、さらにビューへの引数の型が要求されるなどrailsとは違った苦労もありましたが
@@ -139,10 +157,7 @@ railsはそれなりに使ったことがあったのも良かったのかもビ
 実際Play!を使ったのは今回が初めてでしたが、それほど戸惑うことなく（検索画面と検索結果の2ページしかないしょっぽいウェブサイトですが）サクサク作ることができました。
 
 \subsubsection{ドメインとったよ}
-最初は自分が普段使っているサイトのサブドメインで運用していたのですが、pediaroute.com
-ServersMan VPSの2GBプランを選択し、Ubuntu Server 10.04に適当に設定を加え（sshd、firewallくらい）をsshdとweb以外は使えなくする、
-Playを適当にデプロイしました。
-MySQLも使わないし、あっという間に終わりました。
+最初は自分が普段使っているサイトのサブドメインで運用していたのですが、仲間の助言もあり、せっかくだし専用のドメインにするかと思い、pediaroute.comを取りました。
 
 \subsubsection{負荷ヤバイの話}
 公開した初日はIRCのメンバーと自身のツイッターでつぶやいた程度だったため、全然流行らず作っただけの自己満で終わるところでした。
@@ -157,6 +172,9 @@ MySQLも使わないし、あっという間に終わりました。
 このロックとPlay!のりクエスト処理の相性が悪かったようで、その後Promiseという仕組みを使って書き直したところ落ちることはなくなりました。
 身を持って慣れてないウェブフレームワークを使うことの難しさを再考させられる経験になりました。
 
+\subsubsection{そのあと}
+
+
 \subsection{まとめ、今後の予定}
 pediarouteの話はどこかで書こうと思っていたのですが、こういう形で過去の創作物の話をまとめることができて幸いでした。
 当時は「コーディング・ハイ」という感じで、だれることなくフルスピードでプログラムを仕上げることができ、とても楽しかったのをよく覚えています。
@@ -164,19 +182,38 @@ pediarouteの話はどこかで書こうと思っていたのですが、こう�
 
 \section{iPhoneで他のアプリと連携}
 こんにちは。会社や趣味でiPhoneアプリを作ったりしている@mtgtoです。
-会社では複数のiPhoneアプリを作っているのですが、
-この話はApp Storeのレビューを受けてない話も含まれるので、実際に使用する際は自己責任でお願い致します。
+今までに複数のiPhoneアプリを作っているのですが、アプリ間の連携をやったりしたことがありました。
+AndroidのServiceのような仕組みがないiOSではアプリ間の連携はあまり得意ではないようですが、気になったので色々と調べたり試したりしてみました。
 
+\subsection{諸注意}
+\begin{itemize}
+  \item この話はApp Storeのレビューを受けてない話が含まれるので、実際に使用する際は自己責任でお願い致します。
+  \item 動作確認にはLion 10.7.4 on MacBook Air (2011), Xcode 4.3.3, iOS 5.1.1 on iPhone 4を使用しています。
+  \item 実行に使用したソースコードは http://github.com/mtgto/c82 から見ることができます。
+\end{itemize}
 \subsection{NSURL形式}
-公式で用意されている由緒正しい方法です。
-カスタムURLスキーマ
-iOS 4.1までは起動アプリが何かを判定できないよ
+Appleによる公式で用意されている由緒正しいプロセス間のデータのやり取りを行う方法です。
+
+自分のアプリオリジナルのカスタムURLスキーム（URLのプロトコル部分）をInfo.plistに書いておき、
+そのプロトコルを使ったURLを開くことで別のアプリの起動＆URLにデータを含めることでデータの受け渡しをすることができます。
+
+このカスタムURLスキームを使う方法は、iOS 4.1までのAPIでは起動アプリが何かを判定できません。
+\begin{itembox}{起動URL取得 (iOS 4.1まで)}
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
-iOS 4.2以上でいいならこっちを使ってね
+\end{itembox}
+iOS 4.2以上では起動元アプリの情報が取れるAPIが提供され、上記の物は非推奨となりました。
+\begin{itembox}{起動URL取得 (iOS 4.2以降)}
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
-iPhone Simulatorや実機上で実行してみるとわかりますが、sourceApplicationには起動したアプリのバンドルIDが来るので、
+\end{itembox}
+iPhone Simulatorや実機上でURLスキーマによるアプリの起動を試してみるとわかりますが、sourceApplicationには起動したアプリのバンドルIDが来るので、
+自分以外のアプリからの起動であればNOを返すことにより自分が許可するアプリからのみ要求された動作を行うことが可能です
+（他のアプリから起動させないことは不可能）。
+特にUIWebViewを多用しているウェブアプリからネイティブのコードを呼び出すときにはこのカスタムURLスキームの仕組みを使用することが多いと思いますが、
+その場合も自分のアプリのバンドルIDから起動されているかのチェックを行うようにしましょう。
 
 \subsubsection{受け取ったクエリをパースする方法}
+URL形式でデータを渡すときにはURLのクエリ部分を辞書のように使うことが一般的である気がします（実経験より）。
+以下どこにでもあるようなURLパースの処理（NSStringのカテゴリとして拡張しておくといいと思う）。
 \begin{lstlisting}{language=[objective]c;caption=起動URLクエリをパースする方法}
 for (NSString* parameterString in [queryString componentsSeparatedByString:@"&"]) {
   NSArray* parameterArray = [parameterString componentsSeparatedByString:@"="];
@@ -192,9 +229,9 @@ for (NSString* parameterString in [queryString componentsSeparatedByString:@"&"]
 }
 \end{lstlisting}
 \subsubsection{Facebook SDK}
-Facebook iOS SDKではこの仕組みを利用して、自作アプリからFacebookアプリを呼び出してユーザ認証などを行うことができます。
+\htmladdnormallinkfoot{Facebook iOS SDK}{https://developers.facebook.com/docs/mobile/ios/build/}ではこの仕組みを利用して、自作アプリからFacebookアプリを呼び出してユーザ認証などを行うことができます。
 用意するもの：
-まず自分のプロジェクトにFacebook SDKをインポートを行い、Facebookから呼び出されるためのカスタムURLスキーマをInfo.plistに登録します。
+Facebookへの自分のアプリの登録と、まず自分のプロジェクトにFacebook SDKをインポートを行い、Facebookから呼び出されるためのカスタムURLスキーマをInfo.plistに登録します。
 
 \subsection{ソケット通信}
 先のNSURL形式では情報を通知するために別アプリを一度フォアグラウンドにする必要があります。
@@ -235,17 +272,30 @@ Mac OS Xの場合、NSDistributedNotificationCenterを使って他のアプリ�
 
 \subsection{共有メモリ形式}
 iOSにはサンドボックス機構があり、他プロセスのメモリに直接アクセスすることは出来ません。
+そこで（POSIXの）共有メモリを使ってプロセス間で読み書きを行うということを考えました。
+
+方法としては、POSIXのshm\_open関数でファイルディスクリプタのように開き、mmapすることでメモリとして扱うことができます。
 
 \subsection{ファイル}
-iOS アプリケーションプログラミングガイドによると
-https://developer.apple.com/jp/devcenter/ios/library/documentation/iPhoneAppProgrammingGuide.pdf
-アプリケーション（および環境設定を含むデータ）をサンドボックス内に
+\htmladdnormallinkfoot{iOS アプリケーションプログラミングガイド}{https://developer.apple.com/jp/devcenter/ios/library/documentation/iPhoneAppProgrammingGuide.pdf}によると
+アプリケーション（および環境設定を含むデータ）はサンドボックスでデータが保護されており、
+他のアプリからアクセスすることができない、とあります。
 
-\subsection{NSUserDefaults}
-だめだよ！
+ものは試しにと実際にあるアプリでファイルの書き込みを行い、そのファイルを他のアプリからアクセスするプログラムを作って実際にやってみたところ、
+iOS Simulatorでは
+``~/Library/Application Support/iPhone Simulator/5.1/Applications/(UUID)/''に書きだされ、他のアプリからパスを指定すれば開くことができましたが（サンドボックスの保護がされていない）、実機では
+``The operation couldn't be completed. Operation not permitted''というエラー(NSErrorのdescription)が発生して開けませんでした。
+
+\subsection{NSUserDefaults \& KeyChain Access}
+NSUserDefaultsはだめだよ！
+NSUserDefaultsの説明に「他のアプリの設定へのaddSuiteNamed:を使ったアクセスは取得できないよ」とあります。
+
+一方Keychainは\htmladdnormallinkfoot{同一プロビジョニングであれば他のアプリの設定項目を見ることができる}{http://cocoadays.blogspot.jp/2011/02/ios-keychain-services.html}との話があるので、自分のアプリであればキーチェーンを使ったデータの共有ができるようです。
 
 \subsection{脱線：fork}
 あまり関係ないのですが、iPhoneでforkすればAndroidのServiceのようなことができるのではないかと思って試してみました。
+forkというのは自分のプロセスを複製して新しいプロセスを作るPOSIXの関数です。
+試しにこんなコードを書いてみました：
 \begin{lstlisting}{language=c;caption=fork}
 int pid = fork();
 	if (pid < 0) {
@@ -261,11 +311,12 @@ int pid = fork();
 		return retVal;
 	}
 \end{lstlisting}
-シミュレータだと動いたけど、実機だとエラーが帰ってきて残念ながらダメでした。
+フレームワークの追加をすることなく、コンパイル＆リンクには成功しました。
 
-\subsection{音}
+実際に動かしてみたところiOS Simulatorでは動作しましたが、実機だとエラーが帰ってきました。
+残念ながらforkはできないようです。
 
-\subsection{加速度センサー}
-
+\subsection{終わりに}
+今回は試しませんでしたが、OSが提供しているデータ共有のAPI、例えばカレンダーや写真を使う方法もあるでしょう。
 
 \end{document}
