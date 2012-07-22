@@ -274,8 +274,6 @@ for (NSString* parameterString in [queryString componentsSeparatedByString:@"&"]
 \end{lstlisting}
 \subsubsection{Facebook SDK}
 \htmladdnormallinkfoot{Facebook iOS SDK}{https://developers.facebook.com/docs/mobile/ios/build/}ではこの仕組みを利用して、自作アプリからFacebookアプリを呼び出してユーザ認証などを行うことができます。
-用意するもの：
-Facebookへの自分のアプリの登録と、まず自分のプロジェクトにFacebook SDKをインポートを行い、Facebookから呼び出されるためのカスタムURLスキーマをInfo.plistに登録します。
 
 \subsection{ソケット通信}
 先のNSURL形式では情報を通知するために別アプリを一度フォアグラウンドにする必要があります。
@@ -311,7 +309,7 @@ Mac OS Xの場合、NSDistributedNotificationCenterを使って他のアプリ�
 \end{itemize}
 
 ただしCPDistributedMessagingCenterはプライベートAPIなので、App Storeに出すときにはほぼ間違いなくリジェクト食らうと思います。
-個人のiPhoneで楽しむか、jailbreak環境で楽しむくらいがいいですね。
+とはいえ便利なので個人のiPhoneで楽しむか、jailbreak環境で楽しむくらいがいいですね。
 
 \subsection{共有メモリ形式}
 iOSにはサンドボックス機構があり、他プロセスのメモリに直接アクセスすることは出来ません。
@@ -330,7 +328,6 @@ iOS Simulatorでは
 ``The operation couldn't be completed. Operation not permitted''というエラー(NSErrorのdescription)が発生して開けませんでした。
 
 \subsection{NSUserDefaults \& KeyChain Access}
-NSUserDefaultsはだめだよ！
 NSUserDefaultsの説明に「他のアプリの設定へのaddSuiteNamed:を使ったアクセスは取得できないよ」とあります。
 
 一方Keychainは\htmladdnormallinkfoot{同一プロビジョニングであれば他のアプリの設定項目を見ることができる}{http://cocoadays.blogspot.jp/2011/02/ios-keychain-services.html}との話があるので、自分のアプリであればキーチェーンを使ったデータの共有ができるようです。
