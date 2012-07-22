@@ -3,7 +3,22 @@
 
 \usepackage{ascmac}
 \usepackage{listings}
-\usepackage[dvipdfm]{hyperref}
+\usepackage[dvipdfm]{hyperref,graphicx}
+
+\renewcommand{\lstlistingname}{リスト}
+\lstset{language=[objective]c,
+  basicstyle=\ttfamily\scriptsize,
+  commentstyle=\textit,
+  classoffset=1,
+  keywordstyle=\bfseries,
+  frame=tRBl,
+  framesep=5pt,
+  showstringspaces=false,
+%  numbers=left,
+  stepnumber=1,
+  numberstyle=\tiny,
+  tabsize=2
+}
 
 \title{nanaka-inside C82配布物}
 \author{nanaka-inside}
@@ -20,12 +35,22 @@
 
 昨年の今頃、私はとあるSNSサービスの新規立ち上げの開発に携わっており、土日があったりなかったりという程度の忙しさに巻き込まれていました。
 ちょうどその頃は仕事も佳境にきており、私の仕事は品質保証テストで上がってきた問題の解決を行うということがほとんどでした。
+職業上仕方がないことなのですが、家に帰って寝るだけの日々に辟易していました。
 そんな折に「\htmladdnormallinkfoot{wikipediaは6回リンクを辿ればどのページでもいけるらしいｗｗｗ}{http://blog.livedoor.jp/goldennews/archives/51657545.html}」という記事をRSSリーダーで見かけました。
 
 私がこの記事を読んだ時に、ふと「これって自動で見つけられるのかな」と思ったところからこの話は始まります。
 
 なお3分クッキングよろしく\htmladdnormallinkfoot{実際に完成したサイト}{http://pediaroute.com/}がありますので、探索の仕組みやら作った時の苦労話に興味が無い方は読み飛ばしていただいて構いません。
 お手数ですが右上の×ボタンを押して閉じてください。
+
+例えば「ゆりかご」から「墓場」までをpediarouteで検索すると、
+\begin{figure}
+  \centering
+  \fbox{
+    \includegraphics[width=9cm,clip]{yurikago-hakaba.png}
+  }
+\end{figure}
+探索時間0.00秒以内で「ゆりかご」→「木材」→「槍」→「レギオン」→「墓場」という解答を見つけることができます。
 
 \subsection{設計}
 知人の知人というように辿って行くとわずか6回辿るだけで世界中の人間に辿り着けるという話を聞いたことがあるでしょうか？
@@ -85,7 +110,22 @@ S_0 = {N_S}, G_0 = {N_G}
 \item 見つからなければ2. に戻る。5回探索しても見つからなかったらリンクがないと返す。
 \end{enumerate}
 \end{itembox}
-※図がほしい→KeyNoteのあれ
+\begin{figure}
+  \centering
+  \fbox{
+    \includegraphics[width=9cm,clip]{pediaroute01.pdf}
+  }
+  \fbox{
+    \includegraphics[width=9cm,clip]{pediaroute02.pdf}
+  }
+  \fbox{
+    \includegraphics[width=9cm,clip]{pediaroute03.pdf}
+  }
+  \fbox{
+    \includegraphics[width=9cm,clip]{pediaroute04.pdf}
+  }
+  \caption{探索の例}
+\end{figure}
 
 \subsubsection{使用言語の選択}
 今回の設計ではすべてのリンクをメモリ上におかなければなりません。
@@ -173,7 +213,11 @@ railsはそれなりに使ったことがあったのも良かったのかもビ
 身を持って慣れてないウェブフレームワークを使うことの難しさを再考させられる経験になりました。
 
 \subsubsection{そのあと}
+そのあとはちょいとある程度まともなデザインに仕上げたりしましたが、仕事が忙しいのと（そればっかり）飽きたのもあり、特に話題にもならず、ひっそりと忘れ去られて行きました。
+いや、まだあるけどね！この原稿をあなたが手にとっているときにまだサービス続けてるけどね！
+広告もつけてないから続ければ続けるほど損するシステムなんだけどね！
 
+wikitterの中の人とtwitterでやり取りしたりもしましたが、内容はないしょにしておきます。
 
 \subsection{まとめ、今後の予定}
 pediarouteの話はどこかで書こうと思っていたのですが、こういう形で過去の創作物の話をまとめることができて幸いでした。
@@ -192,7 +236,7 @@ AndroidのServiceのような仕組みがないiOSではアプリ間の連携は
   \item 実行に使用したソースコードは http://github.com/mtgto/c82 から見ることができます。
 \end{itemize}
 \subsection{NSURL形式}
-Appleによる公式で用意されている由緒正しいプロセス間のデータのやり取りを行う方法です。
+まず最初に紹介するのはAppleによる公式で用意されている由緒正しいプロセス間のデータのやり取りを行う方法です。
 
 自分のアプリオリジナルのカスタムURLスキーム（URLのプロトコル部分）をInfo.plistに書いておき、
 そのプロトコルを使ったURLを開くことで別のアプリの起動＆URLにデータを含めることでデータの受け渡しをすることができます。
@@ -213,7 +257,7 @@ iPhone Simulatorや実機上でURLスキーマによるアプリの起動を試�
 
 \subsubsection{受け取ったクエリをパースする方法}
 URL形式でデータを渡すときにはURLのクエリ部分を辞書のように使うことが一般的である気がします（実経験より）。
-以下どこにでもあるようなURLパースの処理（NSStringのカテゴリとして拡張しておくといいと思う）。
+以下どこにでもあるようなURLパースの処理（こういうのをNSStringのカテゴリとして拡張してマイ・プロジェクトにおいておくといいと思う）。
 \begin{lstlisting}{language=[objective]c;caption=起動URLクエリをパースする方法}
 for (NSString* parameterString in [queryString componentsSeparatedByString:@"&"]) {
   NSArray* parameterArray = [parameterString componentsSeparatedByString:@"="];
@@ -239,7 +283,6 @@ Facebookへの自分のアプリの登録と、まず自分のプロジェクト
 プロセスがバックグラウンドにいるときに
 バックグラウンドで実行しているアプリケーションは通常だと10分までしか処理を行なってくれず、
 それを超えるとOSによってプロセスが強制的に終了されてしまいます。
-→他のプロセスが生きてるかどうか分かる？
 
 ここでは\htmladdnormallinkfoot{CocoaAsyncSocket}{https://github.com/robbiehanson/CocoaAsyncSocket}を使ってみましょう。
 GCD版とRunLoop版の二種類がありますが、iOSの場合ハードウェアリソースに限りがあるので、どちらでも構わないと思っています。
