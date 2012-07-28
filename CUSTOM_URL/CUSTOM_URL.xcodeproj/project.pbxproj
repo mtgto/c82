@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CE5E7A7715C3EB23000C5BCA /* Default-mtgtotest.png in Resources */ = {isa = PBXBuildFile; fileRef = CE5E7A7615C3EB23000C5BCA /* Default-mtgtotest.png */; };
+		CE5E7A7A15C3EC0A000C5BCA /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = CE5E7A7915C3EC0A000C5BCA /* Default.png */; };
 		CEE7A09D15A997DB00D77D20 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE7A09C15A997DB00D77D20 /* UIKit.framework */; };
 		CEE7A09F15A997DB00D77D20 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE7A09E15A997DB00D77D20 /* Foundation.framework */; };
 		CEE7A0A115A997DB00D77D20 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE7A0A015A997DB00D77D20 /* CoreGraphics.framework */; };
@@ -18,6 +20,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CE5E7A7615C3EB23000C5BCA /* Default-mtgtotest.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-mtgtotest.png"; sourceTree = "<group>"; };
+		CE5E7A7915C3EC0A000C5BCA /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		CEE7A09815A997DB00D77D20 /* CUSTOM_URL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CUSTOM_URL.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEE7A09C15A997DB00D77D20 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		CEE7A09E15A997DB00D77D20 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -90,6 +94,8 @@
 		CEE7A0A315A997DB00D77D20 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				CE5E7A7915C3EC0A000C5BCA /* Default.png */,
+				CE5E7A7615C3EB23000C5BCA /* Default-mtgtotest.png */,
 				CEE7A0A415A997DB00D77D20 /* CUSTOM_URL-Info.plist */,
 				CEE7A0A515A997DB00D77D20 /* InfoPlist.strings */,
 				CEE7A0A815A997DB00D77D20 /* main.m */,
@@ -151,6 +157,8 @@
 			files = (
 				CEE7A0A715A997DB00D77D20 /* InfoPlist.strings in Resources */,
 				CEE7A0B015A997DB00D77D20 /* MainStoryboard.storyboard in Resources */,
+				CE5E7A7715C3EB23000C5BCA /* Default-mtgtotest.png in Resources */,
+				CE5E7A7A15C3EC0A000C5BCA /* Default.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,6 +283,7 @@
 				CEE7A0B815A997DB00D77D20 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
